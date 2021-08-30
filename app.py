@@ -1,4 +1,5 @@
 from os import stat
+import zipfile
 from re import U, sub, subn
 from sys import stderr, stdout
 from flask import Flask,request, render_template, redirect
@@ -29,7 +30,7 @@ def index():
     return render_template('index.html',docker_ps = data)
 
 
-# send over custom Dockerfile. Could be more secure by having random assigned data so otehr dockerfiles cannot be leaked...
+# send over custom Dockerfile. Could be more secure by having random assigned data so other dockerfiles cannot be leaked...
 @app.route('/upload/dockerfile',methods=["POST"])
 def upload_dockerfile():
     # get file upload
@@ -37,12 +38,20 @@ def upload_dockerfile():
 
     # get name of container to save under upload
     p = request.form.get('container-name')
+
     # make file upload path (even if it exists / does not exist)
     Path(f"uploads/{p}/").mkdir(parents=True, exist_ok=True)
 
     # sanitize upload path, add it to the uploads directory
     f.save(f"uploads/{p}/" + secure_filename(f.filename))
     # f.save(secure_filename(f.filename))
+    print(f.content_type)
+
+    print(f"uploads/{p}/" + secure_filename(f.filename))
+    if f.content_type == "application/zip":
+        with zipfile.ZipFile(f"uploads/{p}/" + secure_filename(f.filename),"r") as zip_ref:
+            zip_ref.extractall(f"uploads/{p}/")        
+
 
     return render_template("index.html",upload_output = f"succesfully uploaded {p} ")
 
@@ -68,6 +77,7 @@ def run_dockerfile():
     PORT = get_port()  
     
     container_name = request.form.get("container-name")
+    container_user = request.form.get("container-user")
     # Can be python, login, etc.
     shell = request.form.get("container-shell")
 
