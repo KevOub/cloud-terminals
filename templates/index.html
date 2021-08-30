@@ -1,0 +1,75 @@
+<html>
+
+<body>
+    <span>
+        <h1>DOCKER PS </h1>
+    </span>
+    {%- for line in docker_ps %}
+    {{ line}}
+    <br>
+    {% endfor %}
+    <hr>
+
+
+    <span>
+        <h1>UPLOAD DOCKER IMAGE</h1>
+    </span>
+    <form action="http://localhost:7777/upload/dockerfile" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" />
+        name of container
+        <input type="text" name="container-name">
+        <input type="submit" />
+    </form>
+    <h4>OUTPUT = </h4>
+    {{upload_output}}
+    <hr>
+
+    <span>
+        <h1>BUILD DOCKER IMAGE</h1>
+    </span>
+    <form action="http://localhost:7777/build/dockerfile" method="POST" enctype="multipart/form-data">
+        name of container
+        <input type="text" name="container-name" placeholder="default">
+        <input type="submit" />
+    </form>
+    <h4>OUTPUT = </h4>
+    {{build_output}}
+    <hr>
+
+    <span>
+        <h1>RUN DOCKER IMAGE</h1>
+    </span>
+    <form action="http://localhost:7777/run/dockerfile" method="POST" enctype="multipart/form-data">
+        name of container
+        <input type="text" name="container-name" value="default">
+        user 
+        <input type="text" name="container-user">
+        shell (I.E., python, bash, login)
+        <input type="text" name="container-shell" value="bash">
+        <input type="submit" />
+    </form>
+    <h4>OUTPUT = </h4>
+    {{run_output}}
+    <hr>
+
+    <span>
+        <h1>STOP DOCKER IMAGE</h1>
+    </span>
+    <form action="http://localhost:7777/stop/dockerfile" method="POST" enctype="multipart/form-data">
+        id of container
+        <input type="text" name="container-id" value="default">
+        <input type="submit" >
+    </form>
+    
+    <h4>OUTPUT = </h4>
+    {%- for line in stop_output %}
+    {{ line}}
+    <br>
+    {% endfor %}
+    <hr>
+
+
+
+</body>
+
+</html>
