@@ -41,17 +41,17 @@ def upload_dockerfile():
     p = request.form.get('container-name')
 
     # make file upload path (even if it exists / does not exist)
-    Path(f"uploads/"+ secure_filename(p)).mkdir(parents=True, exist_ok=True)
+    Path(f"uploads/{p}/").mkdir(parents=True, exist_ok=True)
 
     # sanitize upload path, add it to the uploads directory
-    f.save(f"uploads/"+ secure_filename(p) + secure_filename(f.filename))
+    f.save(f"uploads/{p}/" + secure_filename(f.filename))
 
     print(f.content_type)
 
-    print(f"uploads/"+ secure_filename(p) + secure_filename(f.filename))
+    print(f"uploads/{p}" + secure_filename(f.filename))
     if f.content_type == "application/zip":
-        with zipfile.ZipFile(f"uploads/"+ secure_filename(p) + secure_filename(f.filename),"r") as zip_ref:
-            zip_ref.extractall(f"uploads/"+secure_filename(p))        
+        with zipfile.ZipFile(f"uploads/{p}/" + secure_filename(f.filename),"r") as zip_ref:
+            zip_ref.extractall(f"uploads/{p}/")        
 
 
     return render_template("index.html",upload_output = f"succesfully uploaded {p} ")
@@ -93,7 +93,10 @@ def run_dockerfile():
     # build_out = subprocess.run(f"`docker run -d --env MYPORT=8082 -it -p {PORT}:{PORT} {container_name}:latest ttyd -p {PORT} {shell}`",shell=True)
     print(build_out)
     if status == 0:
-        return render_template("index.html", run_output=f"launched {container_name} on port {PORT}. Enjoy :) \nContainer ID = {output}", latest_docker_running=f"http://localhost:{PORT}")
+        hostname = socket.gethostname()
+        local_ip = socket.gethostbyname(hostname)
+        print(local_ip)
+        return render_template("index.html", run_output=f"launched {container_name} on port {PORT}. Enjoy :) \nContainer ID = {output}")
     else:
         return render_template("index.html",run_output=f"failed to launch {container_name}. Probably forgot to build first Here is the stacktrace: {build_out}")
 

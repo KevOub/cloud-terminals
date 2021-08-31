@@ -14,7 +14,7 @@
     <span>
         <h1>UPLOAD DOCKER IMAGE</h1>
     </span>
-    <form action="http://localhost:7777/upload/dockerfile" method="POST" enctype="multipart/form-data">
+    <form action="/upload/dockerfile" method="POST" enctype="multipart/form-data">
         <input type="file" name="file" />
         name of container
         <input type="text" name="container-name">
@@ -27,7 +27,7 @@
     <span>
         <h1>BUILD DOCKER IMAGE</h1>
     </span>
-    <form action="http://localhost:7777/build/dockerfile" method="POST" enctype="multipart/form-data">
+    <form action="/build/dockerfile" method="POST" enctype="multipart/form-data">
         name of container
         <input type="text" name="container-name" placeholder="default">
         <input type="submit" />
@@ -39,7 +39,7 @@
     <span>
         <h1>RUN DOCKER IMAGE</h1>
     </span>
-    <form action="http://localhost:7777/run/dockerfile" method="POST" enctype="multipart/form-data">
+    <form action="/run/dockerfile" method="POST" enctype="multipart/form-data">
         name of container
         <input type="text" name="container-name" value="default">
         user 
@@ -61,7 +61,7 @@
     <span>
         <h1>STOP DOCKER IMAGE</h1>
     </span>
-    <form action="http://localhost:7777/stop/dockerfile" method="POST" enctype="multipart/form-data">
+    <form action="/stop/dockerfile" method="POST" enctype="multipart/form-data">
         id of container
         <input type="text" name="container-id" value="default">
         <input type="submit" >
@@ -78,7 +78,7 @@
     <span>
         <h1>INSPECT DOCKER IMAGE</h1>
     </span>
-    <form action="http://localhost:7777/data/dockerfile" method="POST" enctype="multipart/form-data">
+    <form action="/data/dockerfile" method="POST" enctype="multipart/form-data">
         id of container
         <input type="text" name="container-id" value="default">
         <input type="submit" >
