@@ -14,4 +14,5 @@ RUN chmod +x /tini
 ENTRYPOINT ["/tini", "--"]
 EXPOSE ${MYPORT}
 
+# TODO overwrite with docker run :0
 CMD ["ttyd","bash"]

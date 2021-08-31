@@ -87,7 +87,7 @@ def run_dockerfile():
     # build_out = subprocess.run(f"`docker run -d --env MYPORT=8082 -it -p {PORT}:{PORT} {container_name}:latest ttyd -p {PORT} {shell}`",shell=True)
     print(build_out)
     if status == 0:
-        return render_template("index.html", run_output=f"launched {container_name} on port {PORT}. Enjoy :)")
+        return render_template("index.html", run_output=f"launched {container_name} on port {PORT}. Enjoy :)", latest_docker_running=f"http://localhost:{PORT}")
     else:
         return render_template("index.html",run_output=f"failed to launch {container_name}. Probably forgot to build first Here is the stacktrace: {build_out}")
 
