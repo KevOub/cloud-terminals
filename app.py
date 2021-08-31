@@ -1,6 +1,7 @@
 from os import stat
 import zipfile
 from re import U, sub, subn
+from shlex import quote
 from sys import stderr, stdout
 from flask import Flask,request, render_template, redirect
 from flask.helpers import url_for
@@ -40,17 +41,17 @@ def upload_dockerfile():
     p = request.form.get('container-name')
 
     # make file upload path (even if it exists / does not exist)
-    Path(f"uploads/{p}/").mkdir(parents=True, exist_ok=True)
+    Path(f"uploads/"+ secure_filename(p)).mkdir(parents=True, exist_ok=True)
 
     # sanitize upload path, add it to the uploads directory
-    f.save(f"uploads/{p}/" + secure_filename(f.filename))
-    # f.save(secure_filename(f.filename))
+    f.save(f"uploads/"+ secure_filename(p) + secure_filename(f.filename))
+
     print(f.content_type)
 
-    print(f"uploads/{p}/" + secure_filename(f.filename))
+    print(f"uploads/"+ secure_filename(p) + secure_filename(f.filename))
     if f.content_type == "application/zip":
-        with zipfile.ZipFile(f"uploads/{p}/" + secure_filename(f.filename),"r") as zip_ref:
-            zip_ref.extractall(f"uploads/{p}/")        
+        with zipfile.ZipFile(f"uploads/"+ secure_filename(p) + secure_filename(f.filename),"r") as zip_ref:
+            zip_ref.extractall(f"uploads/"+secure_filename(p))        
 
 
     return render_template("index.html",upload_output = f"succesfully uploaded {p} ")
@@ -58,13 +59,16 @@ def upload_dockerfile():
 # build dockerfile. Do this before running
 @app.route('/build/dockerfile',methods=["POST"])
 def build_dockerfile():
-    container_name = request.form.get("container-name")
+    # ensure that no one can inject code into the shell with `quote`
+    container_name = quote(request.form.get("container-name"))
     print(container_name)
-    # TODO maybe add a tag? to the form upload.
+    
     # build_out = subprocess.run(f"docker build uploads/{container_name}/ -t {container_name}:latest --build-arg MYPORT=8081",shell=True)
     build_out,status = run_cmd(f"docker build uploads/{container_name}/ -t {container_name}:latest --build-arg MYPORT=8081")
     # build_out = subprocess.run(f"docker build . -t {container_name}:latest --build-arg MYPORT={PORT}",shell=True)
-    print(build_out)
+    for output in build_out:
+        print(output)
+
     if status == 0:
         return render_template("index.html",build_output=f"built the container {container_name}")
     else:
@@ -76,18 +80,20 @@ def run_dockerfile():
     # Port to run on
     PORT = get_port()  
     
-    container_name = request.form.get("container-name")
-    container_user = request.form.get("container-user")
+    container_name = quote(request.form.get("container-name"))
+    container_user = quote(request.form.get("container-user"))
     # Can be python, login, etc.
-    shell = request.form.get("container-shell")
-
-    print(container_name)
+    shell = quote(request.form.get("container-shell"))
 
     build_out, status = run_cmd(f"docker run -d --env MYPORT={PORT} -it -p {PORT}:{PORT} {container_name}:latest ttyd -p {PORT} -u {container_user} {shell}")
+
+    for output in build_out:
+        print(output)
+
     # build_out = subprocess.run(f"`docker run -d --env MYPORT=8082 -it -p {PORT}:{PORT} {container_name}:latest ttyd -p {PORT} {shell}`",shell=True)
     print(build_out)
     if status == 0:
-        return render_template("index.html", run_output=f"launched {container_name} on port {PORT}. Enjoy :)", latest_docker_running=f"http://localhost:{PORT}")
+        return render_template("index.html", run_output=f"launched {container_name} on port {PORT}. Enjoy :) \nContainer ID = {output}", latest_docker_running=f"http://localhost:{PORT}")
     else:
         return render_template("index.html",run_output=f"failed to launch {container_name}. Probably forgot to build first Here is the stacktrace: {build_out}")
 
@@ -102,6 +108,21 @@ def stop_dockerfile():
     print(stop_out,status)
     
     return render_template("index.html",stop_output=stop_out)
+
+@app.route('/data/dockerfile',methods=["POST"])
+def data_dockerfile():
+    
+    name_of_container = request.form.get("container-id")
+
+    stats, status = run_cmd(f"docker inspect {name_of_container}")
+    print(stats)
+
+    if status == 0:
+        return "".join(stats)
+    else:
+        return "Error. Docker container might not exist"
+
+    
 
 
 

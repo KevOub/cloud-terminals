@@ -75,6 +75,24 @@
     <hr>
 
 
+    <span>
+        <h1>INSPECT DOCKER IMAGE</h1>
+    </span>
+    <form action="http://localhost:7777/data/dockerfile" method="POST" enctype="multipart/form-data">
+        id of container
+        <input type="text" name="container-id" value="default">
+        <input type="submit" >
+    </form>
+    
+    <h4>OUTPUT = </h4>
+    {%- for line in data_output %}
+    {{ line}}
+    <br>
+    {% endfor %}
+    <hr>
+
+
+
 
 </body>
 
