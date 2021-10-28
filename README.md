@@ -1,5 +1,7 @@
 # Cloud terminal!
 
+This is a fun project meant for cyber.org and for anyone else interested in using docker containers in the web-browser. It utilizes https://github.com/tsl0922/ttyd ( I thought about re-writing a clone of this. It *only* takes me writing a proxy in golang between the frontend javascript library and the backend golang server that must also communicate (securely) with a terminal. However, this repository does everythng that I need :). Eventually, I will update it so it is not just the API explained below. This is a flask app that gives access to Docker image creation so take caution running it. 
+
 How do I explain this? Simple. 
 First, you upload either a `Dockerfile` or a `zip` folder which looks as follows
 (Example of a ZIP folder. Also present under ./example)
